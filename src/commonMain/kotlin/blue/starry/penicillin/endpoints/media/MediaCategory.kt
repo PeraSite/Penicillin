@@ -55,5 +55,23 @@ public enum class MediaCategory(override val value: String?): EnumRequestParamet
     /**
      * For other video.
      */
-    AmplifyVideo("amplify_video")
+    AmplifyVideo("amplify_video"),
+    
+    
+    /**
+     * For direct message image.
+     */
+    DM_Image("dm_image"),
+    
+    
+    /**
+     * For direct message gif.
+     */
+    DM_Gif("dm_gif"),
+    
+    
+    /**
+     * For direct message video.
+     */
+    DM_Video("dm_video"),
 }

@@ -51,12 +51,14 @@ private const val segmentMaxSize = 5 * 1024 * 1024
  * @return [DelegatedAction] for [blue.starry.penicillin.models.Media] model.
  */
 public fun Media.uploadMedia(
-    media: MediaComponent
+    media: MediaComponent,
+    shared: Boolean = false
 ): ApiAction<blue.starry.penicillin.models.Media> = DelegatedAction {
     val init = uploadInit(
         totalBytes = media.data.size,
         mediaType = media.type,
-        mediaCategory = media.category
+        mediaCategory = media.category,
+        shared = shared
     ).execute()
 
     media.data.asSequence()

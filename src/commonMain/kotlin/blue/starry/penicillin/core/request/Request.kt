@@ -100,7 +100,7 @@ public fun ApiRequestBuilder.jsonBody(vararg pairs: Pair<String, Any?>, mode: Em
     val json = buildJsonObject {
         for ((key, value) in pairs) {
             if (value != null) {
-                key to value.asJsonElement()
+                put(key, value.asJsonElement())
             }
         }
     }

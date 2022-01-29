@@ -52,6 +52,7 @@ public fun Media.uploadInit(
     mediaType: MediaType,
     mediaCategory: MediaCategory = MediaCategory.Default,
     additionalOwners: List<Long>? = null,
+    shared: Boolean = false,
     vararg options: Option
 ): JsonObjectApiAction<blue.starry.penicillin.models.Media> = client.session.post("/1.1/media/upload.json", EndpointHost.MediaUpload) {
     formBody(
@@ -60,6 +61,7 @@ public fun Media.uploadInit(
         "media_type" to mediaType.contentType,
         "media_category" to mediaCategory,
         "additional_owners" to additionalOwners?.joinToString(","),
+        "shared" to shared,
         *options
     )
 }.jsonObject { blue.starry.penicillin.models.Media(it, client) }

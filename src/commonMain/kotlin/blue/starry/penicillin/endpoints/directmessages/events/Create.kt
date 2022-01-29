@@ -27,6 +27,7 @@
 package blue.starry.penicillin.endpoints.directmessages.events
 
 import blue.starry.jsonkt.jsonObjectOf
+import blue.starry.penicillin.core.json.putObject
 import blue.starry.penicillin.core.request.action.JsonObjectApiAction
 import blue.starry.penicillin.core.request.jsonBody
 import blue.starry.penicillin.core.request.parameters
@@ -34,13 +35,17 @@ import blue.starry.penicillin.core.session.post
 import blue.starry.penicillin.endpoints.DirectMessageEvents
 import blue.starry.penicillin.endpoints.Option
 import blue.starry.penicillin.models.DirectMessageEvent
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonObject
 
 /**
  * Publishes a new message_create event resulting in a Direct Message sent to a specified user from the authenticating user. Returns an event if successful. Supports publishing Direct Messages with optional Quick Reply and media attachment. Replaces behavior currently provided by [POST direct_messages/new](https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/new-event).
  * Requires a JSON POST body and Content-Type header to be set to application/json. Setting Content-Length may also be required if it is not automatically.
- * 
+ *
  * [Twitter API reference](https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/new-event)
- * 
+ *
  * @param userId The ID of the user who should receive the direct message.
  * @param text The Message Data Object defining the content to deliver to the recipient.
  * @param type The type of event you are posting. For Direct Messages, use message_create.
@@ -52,9 +57,36 @@ public fun DirectMessageEvents.create(
     userId: Long,
     text: String,
     type: String = "message_create",
-    vararg options: Option
+    mediaID: Long? = null,
+    quickReplies: List<ReplyOption> = listOf(),
+    ctas: List<CTA> = listOf(),
+    vararg options: Option,
 ): JsonObjectApiAction<DirectMessageEvent.Show> = client.session.post("/1.1/direct_messages/events/new.json") {
     parameters(*options)
+    
+    val messageData = buildJsonObject {
+        put("text", text)
+        if (quickReplies.isNotEmpty()) {
+            putJsonObject("quick_reply") {
+                put("type", "options")
+                putObject("options", quickReplies)
+            }
+        }
+        
+        if (ctas.isNotEmpty()) {
+            putObject("ctas", ctas)
+        }
+        
+        if (mediaID != null) {
+            putJsonObject("attachment") {
+                put("type", "media")
+                putJsonObject("media") {
+                    put("id", mediaID.toString())
+                }
+            }
+        }
+    }
+    
     jsonBody(
         "event" to jsonObjectOf(
             "type" to type,
@@ -62,11 +94,15 @@ public fun DirectMessageEvents.create(
                 "target" to jsonObjectOf(
                     "recipient_id" to userId.toString()
                 ),
-                "message_data" to jsonObjectOf(
-                    "text" to text
-                )
+                "message_data" to messageData
             )
         ),
         *options
     )
 }.jsonObject { DirectMessageEvent.Show(it, client) }
+
+@Serializable
+public data class ReplyOption(val label: String, val description: String? = null, val metadata: String? = null)
+
+@Serializable
+public data class CTA(val label: String, val url: String, val type: String = "web_url")

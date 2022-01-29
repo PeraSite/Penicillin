@@ -59,28 +59,19 @@ internal suspend fun ApiAction<*>.finalize(): Pair<HttpRequest, HttpResponse> {
 }
 
 internal fun checkError(request: HttpRequest, response: HttpResponse, content: String? = null, json: JsonObject? = null) {
+    apiActionLogger.trace{"${response.version} ${response.status.value} ${request.method.value} ${request.url}"}
+    apiActionLogger.trace{"Request : $json"}
     apiActionLogger.trace {
-        buildString {
-            append("${response.version} ${response.status.value} ${request.method.value} ${request.url}\n")
-
-            val (requestHeaders, responseHeaders) = request.headers.flattenEntries() to response.headers.flattenEntries()
-            val (longestRequestHeaderLength, longestResponseHeaderLength) = requestHeaders.maxByOrNull { it.first.length }?.first.orEmpty().length + 1 to responseHeaders.maxByOrNull { it.first.length }?.first.orEmpty().length + 1
-            append("Request headers =\n${requestHeaders.joinToString("\n") { "    ${it.first.padEnd(longestRequestHeaderLength)}: ${it.second}" }}\n")
-            append("Response headers =\n${responseHeaders.joinToString("\n") { "    ${it.first.padEnd(longestResponseHeaderLength)}: ${it.second}" }}\n\n")
-
-            append(
-                when {
-                    content == null -> {
-                        "(Streaming Response)"
-                    }
-                    content.isBlank() -> {
-                        "(Empty Response)"
-                    }
-                    else -> {
-                        content
-                    }
-                }
-            )
+        "Response : " + when {
+            content == null -> {
+                "(Streaming Response)"
+            }
+            content.isBlank() -> {
+                "(Empty Response)"
+            }
+            else -> {
+                content
+            }
         }
     }
 
