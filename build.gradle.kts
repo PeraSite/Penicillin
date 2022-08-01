@@ -1,9 +1,9 @@
 plugins {
-    kotlin("multiplatform") version "1.6.10"
-    kotlin("plugin.serialization") version "1.6.10"
+    kotlin("multiplatform") version "1.7.10"
+    kotlin("plugin.serialization") version "1.7.10"
 
-    id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
-    id("com.adarshr.test-logger") version "3.0.0"
+    id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
+    id("com.adarshr.test-logger") version "3.2.0"
     id("net.rdrei.android.buildtimetracker") version "0.11.0"
 
     `maven-publish`
@@ -64,14 +64,14 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                api("io.ktor:ktor-client-core:1.6.7")
+                api("io.ktor:ktor-client-core:2.0.3")
 
-                api("blue.starry:jsonkt:6.1.2")
-                api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+                api("blue.starry:jsonkt:6.2.1")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
 
-                api("com.benasher44:uuid:0.3.1")
-                api("org.jetbrains.kotlinx:kotlinx-datetime:0.3.1")
-                api("io.github.microutils:kotlin-logging:2.1.21")
+                api("com.benasher44:uuid:0.4.1")
+                api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+                api("io.github.microutils:kotlin-logging:2.1.23")
             }
         }
         commonTest {
@@ -88,34 +88,35 @@ kotlin {
                 implementation(kotlin("reflect"))
                 implementation(kotlin("test"))
 
-                implementation("io.ktor:ktor-client-apache:1.6.7")
-                implementation("io.ktor:ktor-client-cio:1.6.7")
-                implementation("io.ktor:ktor-client-jetty:1.6.7")
-                implementation("io.ktor:ktor-client-okhttp:1.6.7")
-                implementation("io.ktor:ktor-client-mock-jvm:1.6.7")
+                implementation("io.ktor:ktor-client-apache:2.0.3")
+                implementation("io.ktor:ktor-client-cio:2.0.3")
+                implementation("io.ktor:ktor-client-java:2.0.3")
+                implementation("io.ktor:ktor-client-jetty:2.0.3")
+                implementation("io.ktor:ktor-client-okhttp:2.0.3")
+                implementation("io.ktor:ktor-client-mock-jvm:2.0.3")
 
                 implementation(kotlin("test-junit5"))
                 implementation("org.junit.jupiter:junit-jupiter:5.8.2")
 
                 implementation("com.twitter.twittertext:twitter-text:3.1.0")
-                implementation("com.google.guava:guava:31.0.1-jre")
+                implementation("com.google.guava:guava:31.1-jre")
 
-                implementation("ch.qos.logback:logback-classic:1.3.0-alpha12")
+                implementation("ch.qos.logback:logback-classic:1.2.11")
             }
         }
 
         named("jsMain") {
             dependencies {
-                api("io.ktor:ktor-client-js:1.6.7")
+                api("io.ktor:ktor-client-js:2.0.3")
 
-                implementation(npm("crypto-js", "4.0.0"))
+                implementation(npm("crypto-js", "4.1.1"))
             }
         }
         named("jsTest") {
             dependencies {
                 implementation(kotlin("test-js"))
 
-                implementation("io.ktor:ktor-client-mock-js:1.6.7")
+                implementation("io.ktor:ktor-client-mock-js:2.0.3")
             }
         }
     }
@@ -123,9 +124,8 @@ kotlin {
     targets.all {
         compilations.all {
             kotlinOptions {
-                apiVersion = "1.6"
-                languageVersion = "1.6"
-                allWarningsAsErrors = true
+                apiVersion = "1.7"
+                languageVersion = "1.7"
                 verbose = true
             }
         }

@@ -44,9 +44,8 @@ public val ApiRequestBuilder.url: String
         protocol = host.protocol,
         host = host.domain,
         port = host.port,
-        encodedPath = path,
-        parameters = parameters.copy()
-    ).buildString()
+        parameters = parameters.copy().build()
+    ).appendPathSegments(path).buildString()
 
 /**
  * Creates "application/x-www-form-urlencoded" content.
@@ -194,6 +193,7 @@ public fun ApiRequestBuilder.header(headers: Headers, mode: EmulationMode? = nul
     }
 }
 
+@OptIn(InternalAPI::class)
 internal fun ParametersBuilder.copy(): ParametersBuilder {
     return ParametersBuilder().apply { appendAll(this@copy) }
 }
