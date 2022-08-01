@@ -1,5 +1,3 @@
-import blue.starry.scriptextender.EnvReference
-
 plugins {
     kotlin("multiplatform") version "1.6.10"
     kotlin("plugin.serialization") version "1.6.10"
@@ -9,11 +7,10 @@ plugins {
     id("net.rdrei.android.buildtimetracker") version "0.11.0"
 
     `maven-publish`
-    signing
-    id("io.codearte.nexus-staging") version "0.30.0"
     id("org.jetbrains.dokka") version "1.6.10"
-    id("blue.starry.scriptextender") version "0.0.2"
 }
+
+version = "6.2.3"
 
 object Publications {
     const val GroupId = "blue.starry"
@@ -36,27 +33,13 @@ object Publications {
     const val GitHubPackagesRepositoryUrl = "https://maven.pkg.github.com/$GitHubUsername/$GitHubRepository"
 }
 
-object Env {
-    val Version = EnvReference("VERSION")
-
-    val OSSRHProfileId = EnvReference("OSSRH_PROFILE_ID")
-    val OSSRHUsername = EnvReference("OSSRH_USERNAME")
-    val OSSRHPassword = EnvReference("OSSRH_PASSWORD")
-
-    val GitHubUsername = EnvReference("GITHUB_USERNAME")
-    val GitHubPassword = EnvReference("GITHUB_PASSWORD")
-
-    val SigningKeyId = EnvReference("SIGNING_KEYID")
-    val SigningKey = EnvReference("SIGNING_KEY")
-    val SigningPassword = EnvReference("SIGNING_PASSWORD")
-}
-
 /*
  * Dependencies
  */
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 kotlin {
@@ -201,43 +184,43 @@ tasks.withType<Test> {
  * Publishing
  */
 
-tasks {
-    register<Jar>("kdocJar") {
-        from(dokkaHtml)
-        dependsOn(dokkaHtml)
-        archiveClassifier.set("javadoc")
-    }
-}
-
+//tasks {
+//    register<Jar>("kdocJar") {
+//        from(dokkaHtml)
+//        dependsOn(dokkaHtml)
+//        archiveClassifier.set("javadoc")
+//    }
+//}
+//
 publishing {
-    repositories {
-        maven {
-            name = "Sonatype"
-            url = uri(
-                if (Env.Version.valueOrNull.orEmpty().endsWith("-SNAPSHOT")) {
-                    Publications.MavenCentralSnapshotRepositoryUrl
-                } else {
-                    Publications.MavenCentralStagingRepositoryUrl
-                }
-            )
-
-            credentials {
-                username = Env.OSSRHUsername.valueOrNull
-                password = Env.OSSRHPassword.valueOrNull
-            }
-        }
-
-        maven {
-            name = "GitHubPackages"
-            url = uri(Publications.GitHubPackagesRepositoryUrl)
-
-            credentials {
-                username = Env.GitHubUsername.valueOrNull
-                password = Env.GitHubPassword.valueOrNull
-            }
-        }
-    }
-
+//    repositories {
+//        maven {
+//            name = "Sonatype"
+//            url = uri(
+//                if (Env.Version.valueOrNull.orEmpty().endsWith("-SNAPSHOT")) {
+//                    Publications.MavenCentralSnapshotRepositoryUrl
+//                } else {
+//                    Publications.MavenCentralStagingRepositoryUrl
+//                }
+//            )
+//
+//            credentials {
+//                username = Env.OSSRHUsername.valueOrNull
+//                password = Env.OSSRHPassword.valueOrNull
+//            }
+//        }
+//
+//        maven {
+//            name = "GitHubPackages"
+//            url = uri(Publications.GitHubPackagesRepositoryUrl)
+//
+//            credentials {
+//                username = Env.GitHubUsername.valueOrNull
+//                password = Env.GitHubPassword.valueOrNull
+//            }
+//        }
+//    }
+//
     publications.withType<MavenPublication> {
         groupId = Publications.GroupId
         artifactId = when (name) {
@@ -248,56 +231,57 @@ publishing {
                 "${rootProject.name}-$name"
             }
         }
-        version = Env.Version.valueOrNull
-
-        pom {
-            name.set(artifactId)
-            description.set(Publications.Description)
-            url.set("https://github.com/${Publications.GitHubUsername}/${Publications.GitHubRepository}")
-
-            licenses {
-                license {
-                    name.set(Publications.LicenseName)
-                    url.set(Publications.LicenseUrl)
-                }
-            }
-
-            developers {
-                developer {
-                    id.set(Publications.DeveloperId)
-                    name.set(Publications.DeveloperName)
-                    email.set(Publications.DeveloperEmail)
-                    organization.set(Publications.DeveloperOrganization)
-                    organizationUrl.set(Publications.DeveloperOrganizationUrl)
-                }
-            }
-
-            scm {
-                url.set("https://github.com/${Publications.GitHubUsername}/${Publications.GitHubRepository}")
-            }
-        }
-
-        artifact(tasks["kdocJar"])
+        version = project.version.toString()
     }
+//
+//        pom {
+//            name.set(artifactId)
+//            description.set(Publications.Description)
+//            url.set("https://github.com/${Publications.GitHubUsername}/${Publications.GitHubRepository}")
+//
+//            licenses {
+//                license {
+//                    name.set(Publications.LicenseName)
+//                    url.set(Publications.LicenseUrl)
+//                }
+//            }
+//
+//            developers {
+//                developer {
+//                    id.set(Publications.DeveloperId)
+//                    name.set(Publications.DeveloperName)
+//                    email.set(Publications.DeveloperEmail)
+//                    organization.set(Publications.DeveloperOrganization)
+//                    organizationUrl.set(Publications.DeveloperOrganizationUrl)
+//                }
+//            }
+//
+//            scm {
+//                url.set("https://github.com/${Publications.GitHubUsername}/${Publications.GitHubRepository}")
+//            }
+//        }
+//
+//        artifact(tasks["kdocJar"])
+//    }
 }
-
-signing {
-    setRequired { gradle.taskGraph.hasTask("publish") }
-    sign(publishing.publications)
-
-    if (Env.SigningKey.isPresent) {
-        @Suppress("UnstableApiUsage")
-        useInMemoryPgpKeys(
-            Env.SigningKeyId.value,
-            Env.SigningKey.value,
-            Env.SigningPassword.value
-        )
-    }
-}
-
-nexusStaging {
-    packageGroup = Publications.OSSRHProfileGroupId
-    stagingProfileId = Env.OSSRHProfileId.valueOrNull
-    username = Env.OSSRHUsername.valueOrNull
-    password = Env.OSSRHPassword.valueOrNull
-}
+//
+//signing {
+//    setRequired { gradle.taskGraph.hasTask("publish") }
+//    sign(publishing.publications)
+//
+//    if (Env.SigningKey.isPresent) {
+//        @Suppress("UnstableApiUsage")
+//        useInMemoryPgpKeys(
+//            Env.SigningKeyId.value,
+//            Env.SigningKey.value,
+//            Env.SigningPassword.value
+//        )
+//    }
+//}
+//
+//nexusStaging {
+//    packageGroup = Publications.OSSRHProfileGroupId
+//    stagingProfileId = Env.OSSRHProfileId.valueOrNull
+//    username = Env.OSSRHUsername.valueOrNull
+//    password = Env.OSSRHPassword.valueOrNull
+//}
