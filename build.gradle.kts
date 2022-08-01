@@ -10,7 +10,7 @@ plugins {
     id("org.jetbrains.dokka") version "1.6.10"
 }
 
-version = "6.2.3"
+version = "6.4.0"
 
 object Publications {
     const val GroupId = "blue.starry"
