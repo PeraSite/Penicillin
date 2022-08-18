@@ -30,6 +30,7 @@ import blue.starry.jsonkt.JsonObject
 import blue.starry.jsonkt.delegation.*
 import blue.starry.penicillin.core.session.ApiClient
 import blue.starry.penicillin.models.DirectMessageEvent.List.*
+import blue.starry.penicillin.models.entities.StatusEntity.*
 import kotlinx.serialization.json.JsonArray
 
 
@@ -85,7 +86,7 @@ public object DirectMessageEvent {
                         val hashtags: kotlin.collections.List<Hashtag> by modelList { Hashtag(it, client) }
                         val symbols: JsonArray by jsonArray
                         val urls: kotlin.collections.List<Url> by modelList { Url(it, client) }
-                        val userMentions: JsonArray by jsonArray("user_mentions")
+                        val userMentions: kotlin.collections.List<UserMentionEntity> by modelList("user_mentions") { UserMentionEntity(it, client) }
                         
                         public data class Hashtag(override val json: JsonObject, override val client: ApiClient) :
                             IndexedEntityModel {
